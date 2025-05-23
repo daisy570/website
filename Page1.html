@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Davao Travel Guide</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+  <link rel="icon" href="https://www.pikpng.com/pngl/b/58-587606_davao-city-ph-official-seal-city-government-of.png" />
+  <style>
+        :root {
+      --primary: brown;
+      --accent: #ffeb3b;
+      --bg-dark: #0c0c0c;
+      --text-light: #fefefe;
+      --glass-bg: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .places-title {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+    .card-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card {
+      border: 2px solid rgba(99, 44, 44, 0.5); 
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      padding: 15px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    }
+    .card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .card h4 {
+      margin: 0 0 8px 0;
+      font-size: 20px;
+    }
+    .card p {
+      margin: 0;
+      color: #555;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    /* Modal styles */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background-color: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      padding: 20px;
+      position: relative;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    #popupClose {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+      color: #000;
+    }
+    #popupImage {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+    #popupTitle {
+      margin-bottom: 10px;
+      font-size: 24px;
+      color: #333;
+    }
+    #popupDescription {
+      font-size: 16px;
+      color: #555;
+      line-height: 1.4;
+    }
+
+    body {
+      position: relative;
+      font-family: 'Segoe UI', sans-serif;
+      color: var(--text-light);
+      overflow-x: hidden;
+
+      background:
+        linear-gradient(to right, rgba(165, 42, 42, 0.8), rgba(0, 0, 0, 0.8)),
+        url('https://lh3.googleusercontent.com/gps-cs-s/AC9h4npLhsaiAMOQ6ZajUbpQjKbU1PJuI9KKY4dvgfINeS0PSqR4xImFzRP0Pa3tW34rDcqoA0zIWPZE1dpvgAZoSAIv-j9XqZglam3b86ZygXI48k8w2udbcyG72e24JZNAFQGMBMk=w424-h240-k-no');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+      z-index: 1;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: url('https://lh3.googleusercontent.com/gps-cs-s/AC9h4npLhsaiAMOQ6ZajUbpQjKbU1PJuI9KKY4dvgfINeS0PSqR4xImFzRP0Pa3tW34rDcqoA0zIWPZE1dpvgAZoSAIv-j9XqZglam3b86ZygXI48k8w2udbcyG72e24JZNAFQGMBMk=w424-h240-k-no');
+      background-size: cover;
+      background-repeat: no-repeat;
+      opacity: 0.1;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 80px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 25px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border-left: 1px solid rgba(255, 255, 255, 0.15);
+      z-index: 100;
+    }
+
+     .sidebar a {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.2rem;
+      color: #fff;
+      padding: 15px 0;
+      transition: color 0.3s ease, transform 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    /* Floating animation for icons */
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+
+    .sidebar a i {
+      animation: float 4s ease-in-out infinite;
+    }
+
+    /* Hover effect */
+    .sidebar a:hover {
+      color: yellow;
+      transform: scale(1.3) rotate(15deg);
+      filter: drop-shadow(0 0 8px brown);
+    }
+
+    /* Jump animation on click */
+    @keyframes jump {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    .jumping {
+      animation: jump 0.5s ease forwards;
+    }
+
+    main {
+      padding: 40px 30px 30px 30px;
+      margin-right: 100px;
+      max-width: 1400px;
+      margin-left: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .places-section {
+      padding: 4rem 2rem;
+      border: 2px solid rgba(99, 44, 44, 0.5); 
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .places-title {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+      color: white;
+    }
+
+    .card-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      justify-items: center;
+    }
+
+    .card {
+      border: 2px solid rgba(99, 44, 44, 0.6); 
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9); 
+      border-radius: 20px;
+      overflow: hidden;
+      padding: 1rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      opacity: 0;
+      transform: scale(0.95) translateY(30px);
+      animation: fadeInUp 1s forwards;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 15px;
+    }
+
+    .card h4 {
+      margin: 1rem 0 0.5rem;
+      font-size: 1.2rem;
+      color: white;
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      color: white;
+    }
+
+    /* Animation keyframes */
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .card.animate {
+      opacity: 1 !important;
+      transform: scale(1) translateY(0) !important;
+    }
+
+    /*Contact Section*/
+    .contact-section {
+      max-width: 1400px;
+      margin: 40px auto;
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid rgba(99, 44, 44, 0.5); 
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .contact-section p {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 1.1rem;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center; 
+      justify-content: center;
+      gap: 1rem;
+      padding: 2rem;
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      max-width: 500px;
+      padding: 12px 15px;
+      border: 2px solid #d2b48c;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: inherit;
+      resize: vertical;
+      text-align: center;
+      transition: border-color 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      border-color: #8B4513;
+      outline: none;
+    }
+
+    /* Submit Section */
+    .submit-btn {
+      margin-top: 25px;
+      background-color: #8B4513;
+      color: white;
+      font-weight: bold;
+      font-size: 1.2rem;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 500px;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      background-color: #a0522d;
+      transform: scale(1.05);
+    }
+
+    /* Logout section */
+    .logout-section {
+      max-width: 500px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 35px 30px;
+      border-radius: 18px;
+      color: #c8f7f7;
+      margin: 0 auto 80px;
+      text-align: center;
+    }
+
+    .logout-section .farewell {
+      font-style: italic;
+      font-size: 1.2em;
+      margin-bottom: 35px;
+      color: #80ffe5;
+    }
+
+    .button.logout-btn {
+      background: linear-gradient(45deg, #00c853, #00e676);
+      border: none;
+      border-radius: 50px;
+      padding: 14px 40px;
+      font-size: 1.2em;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(0, 230, 118, 0.6);
+      transition: all 0.3s ease;
+    }
+
+    .button.logout-btn:hover {
+      background: linear-gradient(45deg, #00e676, #00c853);
+      box-shadow: 0 10px 25px rgba(0, 230, 118, 0.9);
+      transform: scale(1.05);
+    }
+
+    .button.logout-btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 4px 12px rgba(0, 230, 118, 0.7);
+    }
+
+    a[title="Logout"] i {
+      transition: transform 0.2s ease, color 0.3s ease;
+    }
+
+    a[title="Logout"]:hover i {
+      transform: rotate(-10deg) scale(1.2);
+      color: brown;
+    }
+
+    /* Animation for slide-up */
+    .animate-slide-up {
+      animation: slide-up 0.8s ease-out;
+    }
+
+    @keyframes slide-up {
+      0% {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Animation for fade-in */
+    .animate-fade-in {
+      animation: fade-in 1s ease-in;
+    }
+
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+  /*organizational chart*/
+   #organizationchart {
+      padding-top: 80px;
+      padding-bottom: 100px;
+      max-width: 1300px;
+      margin: 60px auto;
+      padding: 30px 40px;
+      background: transparent;
+      border: 2px solid rgba(99, 44, 44, 0.5); 
+      border-radius: 8px; 
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); 
+    }
+
+
+      #organizationchart {
+      max-width: 1400px; /* from 1300px */
+      padding: 20px 30px; /* less padding */
+    }
+
+
+      .org-chart {
+      gap: 30px; /* from 40px */
+    }
+
+    .org-branch {
+      gap: 20px; /* from 30px */
+    }
+
+
+      .org-box {
+      padding: 15px;
+      border-radius: 15px;
+      height: auto; /* remove fixed height */
+    }
+
+    .org-box img {
+      height: 140px; /* from 200px or 100px, adjust as needed */
+    }
+
+    .organizationchart-title {
+      font-size: 2rem; /* from 2.5rem */
+    }
+
+    .org-box h4 {
+      font-size: 1rem;
+    }
+
+    .org-box p {
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+      .org-box img {
+        height: 120px;
+      }
+
+      .organizationchart-title {
+        font-size: 1.6rem;
+      }
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 2rem;
+      color: white;
+      margin: 30px 0;
+      margin-bottom: 20px;
+      position: relative;
+      font-weight: bold;
+      animation: fadeBounceIn 1.2s ease-out;
+    }
+
+    /* Keyframes for fade-in and bouncing effect */
+    @keyframes fadeBounceIn {
+      0% {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      60% {
+        opacity: 1;
+        transform: translateY(10px);
+      }
+      80% {
+        transform: translateY(-5px);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+  /* Map Section */
+  .map-section {
+    max-width: 1400px;
+    margin: 60px auto;
+    padding: 30px 40px;
+    border-radius: 20px;
+    border: 2px solid rgba(99, 44, 44, 0.5); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); 
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    text-align: center;
+    overflow: hidden;
+    animation: slideInFade 1.2s ease forwards;
+    position: relative;
+  }
+
+  .map-section::before {
+    content: "";
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 150px;
+    height: 100px;
+    background: rgba(255, 182, 93, 0.3);
+    border-radius: 50%;
+    filter: blur(60px);
+    z-index: 0;
+    animation: pulseGlow 3s infinite ease-in-out;
+  }
+
+  .map-section::after {
+    content: "";
+    position: absolute;
+    bottom: -50px;
+    left: -50px;
+    width: 130px;
+    height: 130px;
+    background: rgba(255, 146, 37, 0.4);
+    border-radius: 50%;
+    filter: blur(50px);
+    z-index: 0;
+    animation: pulseGlow 3s infinite ease-in-out alternate;
+  }
+
+  .section-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(255, 182, 93, 0.8);
+  }
+
+  .map-description {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    font-weight: 500;
+    color: white;
+    position: relative;
+    z-index: 1;
+  }
+
+  .map-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; 
+    height: 0;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(122, 74, 28, 0.3);
+    z-index: 1;
+  }
+
+  .map-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 18px;
+    transition: transform 0.4s ease;
+  }
+
+  .map-container iframe:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 146, 37, 0.7);
+  }
+
+  /* Animations */
+  @keyframes slideInFade {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 0.3;
+    }
+  }
+
+  /*News Section*/
+  .news-item {
+    border-radius: 12px;
+    padding: 20px 25px;
+    border: 2px solid rgba(99, 44, 44, 0.5); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); 
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+  }
+
+  /* Hover effect: slight lift and stronger shadow */
+  .news-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(30, 40, 90, 0.2);
+  }
+
+  /* News title styling */
+  .news-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e2a78; 
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* News icon next to title */
+  .news-icon {
+    font-size: 1.5rem; /* 24px */
+    color: #3b82f6; /* blue accent */
+  }
+
+  /* News description text */
+  .news-description {
+    font-size: 1rem; /* 16px */
+    color: #334155; /* slate gray */
+    line-height: 1.5;
+    margin-bottom: 15px;
+  }
+
+  /* Link styling */
+  .news-link {
+    font-weight: 600;
+    color: #2563eb; /* blue */
+    text-decoration: none;
+    transition: color 0.25s ease;
+  }
+
+  .news-link:hover {
+    text-decoration: underline;
+    color: #1e40af; /* darker blue on hover */
+  }
+
+  /* Responsive grid container */
+  .grid.md\:grid-cols-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  @media (min-width: 768px) {
+    .grid.md\:grid-cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /*Calendar Secton*/
+  .calendar-events-section {
+    padding: 2rem;
+    border: 2px solid rgba(99, 44, 44, 0.5); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 1400px;
+    margin: auto;
+  }
+
+  .calendar-events-section h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: white;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+
+  .calendar-card {
+    border: 2px solid rgba(99, 44, 44, 0.5); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); 
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    transition: transform 0.2s ease;
+  }
+
+  .calendar-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .calendar-card .date {
+    background: #2c3e50;
+    color: white;
+    font-weight: bold;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .calendar-card img {
+    max-width: 120px;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    object-fit: contain;
+  }
+
+  .calendar-card h3 {
+    color: white;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+  }
+
+  .calendar-card p {
+    color: white;
+    line-height: 1.4;
+    font-size: 0.95rem;
+  }
+
+
+  </style>
+
+</head>
+<body>
+
+    <div class="sidebar">
+      <a href="#home" title="Home"><i class="fas fa-house-user"></i></a>
+      <a href="#places" title="Tourist Spots"><i class="fas fa-map-location-dot"></i></a>
+      <a href="#hotels" title="Top Hotels"><i class="fas fa-bed"></i></a>
+      <a href="#organizationchart" title="City Officials"><i class="fas fa-users-cog"></i></a>
+      
+      <!-- Updated Events icon -->
+      <a href="#events" title="City Events"><i class="fas fa-calendar-check"></i></a>
+
+      <a href="#map" title="City Map"><i class="fas fa-map-pin"></i></a>
+      <a href="#news" title="Latest News"><i class="fas fa-bullhorn"></i></a>
+      <a href="#contact" title="Get in Touch"><i class="fas fa-paper-plane"></i></a>
+
+      <!-- Updated Logout icon -->
+      <a href="#" title="Logout" onclick="confirmLogout()">
+        <i class="fas fa-door-open"></i>
+      </a>
+    </div>
+
+
+  <main>
+        <!-- HERO SECTION -->
+        <section class="hero" id="home" style="
+          display: flex; 
+          align-items: center; 
+          justify-content: center;
+          text-align: center;
+          padding: 4rem 2rem; 
+          background: url('https://vismin.ph/wp-content/uploads/2023/09/Philippine-Eagle-Foundation-1-1024x682.jpg'); 
+          background-size: cover;
+          background-position: center;
+          color: #fff; 
+          border-radius: 15px;
+          min-height: 90vh;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+          position: relative;
+        ">
+          <div class="text" style="
+            max-width: 800px; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: rgba(0, 0, 0, 0.4); 
+            padding: 2rem; 
+            border-radius: 20px;
+          ">
+            <h2 style="font-size: 3.5rem; margin-bottom: 1.2rem; text-shadow: 2px 2px 4px #000;">
+              Discover the <span style="color:#ffeb3b;">Heart of Mindanao</span>:<br> 
+              <span style="font-weight: 900;">Davao City</span>
+            </h2>
+            <p style="font-size: 1.3rem; margin-bottom: 1.2rem; line-height: 1.6em; text-shadow: 1px 1px 3px #000;">
+              Welcome to <strong style="color:#ffeb3b;">Davao</strong> — where <em>adventure meets culture</em> and <em>nature thrives</em>! 🌿✨
+            </p>
+            <p style="font-size: 1.1rem; margin-bottom: 1.2rem; text-shadow: 1px 1px 2px #000;">
+              From towering mountains and lush forests to vibrant markets and peaceful parks — experience the perfect blend of excitement, heritage, and natural beauty in the gem of Southern Philippines.
+            </p>
+            <p style="font-size: 1.1rem; font-weight: 600; color:#ffe066; text-shadow: 1px 1px 2px #000;">
+              Join the vibrant <strong>Kadayawan Festival</strong>, get wild at the <strong>Davao Crocodile Park</strong>, and conquer the majestic <strong>Mount Apo</strong>.
+            </p>
+          </div>
+        </section><br><br>
+
+        <!-- PLACES -->
+        <section class="section places-section" id="places">
+          <h2 class="places-title">🌟 Most-Visited Places in Davao City 🌴</h2>
+
+          <div class="card-list">
+            <!--Mount Apo-->
+            <div class="card">
+              <img src="https://symbolhunt.com/wp-content/uploads/2020/12/Mount-Apo.jpg" alt="Mount Apo" />
+              <h4>Mount Apo</h4>
+              <p>The highest mountain in the Philippines, perfect for trekkers and nature lovers.</p>
+            </div>
+            <!--Eden Nature Park-->
+            <div class="card">
+              <img src="https://2.bp.blogspot.com/-1mW941c5pA8/TeIJhXfUO9I/AAAAAAAAAs8/TJyHK3SpDmw/s640/eden.jpg" alt="Eden Nature Park" />
+              <h4>Eden Nature Park</h4>
+              <p>A serene park filled with gardens, zip lines, and nature activities for the whole family.</p>
+            </div>
+            <!--Davao Crocodile Park-->
+            <div class="card">
+              <img src="https://th.bing.com/th/id/R.cb879e0f49fdcc8fa6e093348c98c457?rik=uMiTVFPAE6D%2b9Q&riu=http%3a%2f%2f1.bp.blogspot.com%2f-fexcfLKDuxY%2fTgV4xA14wXI%2fAAAAAAAABI0%2f1J3XlIp5sHA%2fs640%2fcrock%2bfacade%2bpriority.JPG&ehk=y%2f0PhJRLe3IP1xmjQba6YewapBx46ejko%2b7FMIb350o%3d&risl=&pid=ImgRaw&r=0" alt="Davao Crocodile Park" />
+              <h4>Davao Crocodile Park</h4>
+              <p>Meet crocodiles and other exotic animals at this educational and exciting park.</p>
+            </div>
+            <!--Samal Island-->
+            <div class="card">
+              <img src="https://thaka.bing.com/th/id/OIP.dVpvNRkZCbR43kP0STl3OAHaFj?rs=1&pid=ImgDetMain" alt="Samal Island" />
+              <h4>Samal Island</h4>
+              <p>Just off the coast, this island paradise offers white beaches and top-tier resorts.</p>
+            </div>
+            <!--Philippine Eagle Center-->
+            <div class="card">
+              <img src="https://th.bing.com/th/id/OIP.D8AV4dN9iLag2whjd7ezFgHaD4?cb=iwp2&rs=1&pid=ImgDetMain" alt="Philippine Eagle Center" />
+              <h4>Philippine Eagle Center</h4>
+              <p>A conservation facility where you can see the rare and majestic Philippine Eagle.</p>
+            </div>
+            <!--People's Park-->
+            <div class="card">
+              <img src="https://www.phtourguide.com/wp-content/uploads/2011/06/Peoples-Park.jpg" alt="People's Park" />
+              <h4>People's Park</h4>
+              <p>Colorful statues, fountains, and well-kept gardens make this a relaxing stop downtown.</p>
+            </div>
+            <!--San Pedro Cathedral-->
+            <div class="card">
+              <img src="https://www.bing.com/th/id/OIP.cXXJF0-S9AxNO2leTyRyKgHaE6?w=265&h=200&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2" alt="San Pedro Cathedral" />
+              <h4>San Pedro Cathedral</h4>
+              <p>The oldest church in Davao, with distinct architecture and a sacred atmosphere.</p>
+            </div>
+            <!--Davao Riverfront Complex-->
+            <div class="card">
+              <img src="https://th.bing.com/th/id/R.98c4c943495b192f78a03bebbb5be083?rik=I%2bQ5FTmEEtPxOQ&riu=http%3a%2f%2fmedia.philstar.com%2fimages%2fthe-philippine-star%2fbusiness%2freal-estate%2f20141219%2friverfront-corporate-city-2.jpg&ehk=IMweTkDMqaPiIoLgOrQ2V5nDpc%2bxvSCLXUe5hjjYVvM%3d&risl=&pid=ImgRaw&r=0" alt="Davao Riverfront Complex" />
+              <h4>Davao Riverfront Complex</h4>
+              <p>Home to the Crocodile Park, Butterfly House, and Tribu K’Mindanawan cultural shows.</p>
+            </div>
+            <!--Malagos Garden Resort-->
+            <div class="card">
+              <img src="https://www.bing.com/th?id=OLC.AxEJn%2bN6G0v%2fWQ480x360&w=212&h=180&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2" alt="Malagos Garden Resort" />
+              <h4>Malagos Garden Resort</h4>
+              <p>Interactive chocolate museum, bird feeding, and botanical gardens for all ages.</p>
+            </div>
+            <!--Roxas Night Market-->
+            <div class="card">
+              <img src="https://i.pinimg.com/736x/83/cc/e0/83cce0f8b4f3fd9fd7b03d5e5ca4f1c1.jpg" alt="Roxas Night Market" />
+              <h4>Roxas Night Market</h4>
+              <p>A lively night market featuring street food, ukay-ukay bargains, and local Davao culture.</p>
+            </div>
+            <!-- Matina Town Square -->
+            <div class="card">
+              <img src="https://th.bing.com/th/id/R.7214b4d29cc8c3004a27346fc512364d?rik=oMvMe2GEuUmDGw&riu=http%3a%2f%2fjfmdevelopmentcorp.com%2fwp-content%2fuploads%2f2023%2f07%2fMatina-Town-Square-JFM-Development-Corp-Rotunda-scaled.jpg&ehk=XXxus67dZLL2OwCal2GHrLgPPuu6E5aA2%2bfdKWkfYdE%3d&risl=&pid=ImgRaw&r=0" alt="Matina Town Square">
+              <h4>Matina Town Square</h4>
+              <p>A lively night market offering a variety of street foods, bars, and local entertainment, popular among locals and tourists.</p>
+            </div>
+            <!-- Magsaysay Park -->
+            <div class="card">
+              <img src="https://th.bing.com/th/id/R.b86fd90b540da7bdf8260282650e7054?rik=ltRmBYQ8oztEKA&riu=http%3a%2f%2fwww.phtourguide.com%2fwp-content%2fuploads%2f2010%2f08%2fMagsaysay-Park.jpg&ehk=gYvn3kwmOUxCjQ%2f3zaJw35%2fd0StWlIQ6SvHry5a4iQM%3d&risl=&pid=ImgRaw&r=0" alt="Magsaysay Park">
+              <h4>Magsaysay Park</h4>
+              <p>A historic urban park with gardens, playgrounds, and a scenic pond perfect for family outings and relaxation.</p>
+            </div>
+            <!-- Talikud Island -->
+            <div class="card">
+              <img src="https://www.philippinebeaches.org/wp-content/uploads/2015/01/babusantatalikud.png" alt="Talikud Island">
+              <h4>Talikud Island</h4>
+              <p>A secluded island ideal for snorkeling and diving, boasting crystal clear waters and rich marine biodiversity.</p>
+            </div>
+            <!-- Davao City Hall -->
+            <div class="card">
+              <img src="https://4.bp.blogspot.com/-lsBDtbKVdro/TbDwqxJa8-I/AAAAAAAAAMI/7YDD3X8V258/s1600/davao+city+hall.jpg" alt="Davao City Hall">
+              <h4>Davao City Hall</h4>
+              <p>The center of local government and an iconic landmark located in the heart of Davao City.</p>
+            </div>
+          </div>
+        </section><br><br>
+
+        <!-- Place Popup Modal -->
+        <div id="popupModal" class="modal">
+          <div class="modal-content">
+            <span id="popupClose">&times;</span>
+            <img id="popupImage" src="" alt="event Image" />
+            <h3 id="popupTitle"></h3>
+            <p id="popupDescription"></p>
+          </div>
+        </div>
+
+        <!-- Calendar Events Section -->
+        <section id="events" class="calendar-events-section">
+          <h2>🎉 Upcoming Events in Davao City</h2>
+
+          <div class="calendar-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+            
+            <!-- Event Cards -->
+            <div class="calendar-card">
+              <div>Mar 1–16, 2025</div>
+              <h3>Araw ng Davao</h3>
+              <p>Founding celebration featuring street parades, cultural shows, and trade fairs.</p>
+            </div>
+
+            <div class="calendar-card">
+              <div>Aug 8–17, 2025</div>
+              <h3>Kadayawan Festival</h3>
+              <p>Biggest cultural festival celebrating indigenous tribes with floral parades and dances.</p>
+            </div>
+
+            <div class="calendar-card">
+              <div>April–May</div>
+              <h3>Davao Summerfest</h3>
+              <p>Sports and music festival promoting wellness and community fun.</p>
+            </div>
+
+            <div class="calendar-card">
+              <div>May–June</div>
+              <h3>Davao Food and Wine Festival</h3>
+              <p>Culinary festival showcasing food, wine, and chef specials.</p>
+            </div>
+
+            <div class="calendar-card">
+              <div>September</div>
+              <h3>Agri-Trade Expo</h3>
+              <p>Largest agri-business event in Mindanao featuring innovations and forums.</p>
+            </div>
+
+            <div class="calendar-card">
+              <div>December</div>
+              <h3>Pasko Fiesta sa Davao</h3>
+              <p>Christmas celebration with lights, contests, and family fun events.</p>
+            </div>
+
+            <div class="calendar-card">
+              <div >Jan–Feb</div>
+              <h3>Chinese New Year Festival</h3>
+              <p>Festivities highlighting Davao's Chinese culture and traditions.</p>
+            </div>
+
+            <div class="calendar-card">
+              <div>Aug (Kadayawan)</div>
+              <h3>Dula Kadayawan</h3>
+              <p>Tribal sports and games showcasing indigenous talent and heritage.</p>
+            </div>
+            
+            <div class="calendar-card">
+            <div>September</div>
+              <h3>Davao Coffee Festival</h3>
+              <p>Promoting local coffee growers and showcasing the rich flavors of Davao beans.</p>
+            </div>
+
+            <div class="calendar-card">
+            <div>August</div>
+              <h3>Durian Festival</h3>
+              <p>Celebrating Davao’s king of fruits with fun food-themed activities.</p>
+            </div>
+
+            <div class="calendar-card">
+              <div>June</div>
+              <h3>Davao Eagle Week</h3>
+              <p>Celebrating the majestic Philippine Eagle and conservation efforts.</p>
+            </div>
+
+            <div class="calendar-card">
+              <div>Nov 29, 2025</div>
+              <h3>Miss Tourism International</h3>
+              <p>Pageant promoting tourism, cultural exchange, and beauty with purpose.</p>
+            </div>
+
+            <div class="calendar-card">
+              <div>Oct 11, 2025</div>
+              <h3>Traders Fair & Awards</h3>
+              <p>Global financial and trading conference with networking and seminars.</p>
+            </div>
+
+            <div class="calendar-card">
+              <div>Oct–Nov 2025</div>
+              <h3>Aurora Music Festival</h3>
+              <p>Music, arts, and hot air balloon festival filled with youthful vibes.</p>
+            </div>
+
+            <div class="calendar-card">
+              <div>March</div>
+              <h3>Earth Hour Davao</h3>
+              <p>Environmental event where lights are switched off to support climate awareness.</p>
+            </div>
+
+            <div class="calendar-card">
+              <div>December</div>
+              <h3>Mindanao Film Festival</h3>
+              <p>Annual film event spotlighting Mindanaoan filmmakers and indie films.</p>
+            </div>
+          </div>
+        </section><br><br>
+
+        <!-- Hotel Popup Modal -->
+        <div id="popupModal" class="modal">
+          <div class="modal-content">
+            <span id="popupClose">&times;</span>
+            <img id="popupImage" src="" alt="hotels Image" />
+            <h3 id="popupTitle"></h3>
+            <p id="popupDescription"></p>
+          </div>
+        </div>
+
+        <!--Hotels-->
+        <section class="section places-section" id="hotels">
+            <h2 class="hotels-title">🏨 Top Hotels in Davao — Stay in Comfort & Style ✨</h2>
+            <div class="card-list">
+              <!-- Marco Polo Davao -->
+              <div class="card">
+                <img src="https://klajoo.com/wp-content/uploads/2022/05/Xyz-Marco-Polo-Davao.jpg" alt="Marco Polo">
+                <h4>Marco Polo Davao</h4>
+                <p>Luxury in the city center with a view of Mt. Apo.</p>
+              </div>
+              <!-- Grand Regal Hotel -->
+              <div class="card">
+                <img src="https://pix10.agoda.net/hotelImages/105/10536/10536_15042813490027132022.jpg" alt="Grand Regal">
+                <h4>Grand Regal Hotel</h4>
+                <p>Business-friendly with casino and fine dining.</p>
+              </div>
+              <!-- Park Inn by Radisson -->
+              <div class="card">
+                <img src="https://www.bing.com/th?id=OADD2.7147005708061_171BP6VHQMV99CWFVF&pid=21.2" alt="Park Inn">
+                <h4>Park Inn by Radisson</h4>
+                <p>Near SM Lanang Premier, stylish and accessible.</p>
+              </div>
+              <!-- The Pinnacle Hotel and Suites -->
+              <div class="card">
+                <img src="https://th.bing.com/th/id/OIP.zIOzrW0G8j2L5yEaozRquAAAAA?cb=iwp2&rs=1&pid=ImgDetMain" alt="The Pinnacle Hotel and Suites">
+                <h4>The Pinnacle Hotel and Suites</h4>
+                <p>Located in the city center, The Pinnacle offers comfortable accommodations with easy access to major attractions and business districts.</p>
+              </div>
+              <!-- Waterfront Insular Hotel Davao -->
+              <div class="card">
+                <img src="https://ak-d.tripcdn.com/images/220b0g0000007t5lp676D_R_600_400_R5.webp" alt="Waterfront Insular Hotel Davao">
+                <h4>Waterfront Insular Hotel Davao</h4>
+                <p>A beachfront hotel offering serene views and a relaxing ambiance, perfect for both business and leisure stays.</p>
+              </div>
+              <!-- Seda Abreeza -->
+              <div class="card">
+                <img src="https://www.bing.com/th?id=OADD2.7146977428387_1ORXK4TL6SW8QWFTE0&pid=21.2&c=16&roil=0&roit=0&roir=1&roib=1&w=472&h=247&rs=2&qlt=100" alt="Seda Abreeza">
+                <h4>Seda Abreeza</h4>
+                <p>Seda Abreeza offers modern accommodations with an excellent location near shopping centers like Abreeza Mall. It provides a relaxing atmosphere with stylish rooms and top-notch amenities.</p>
+              </div>
+              <!-- The Royal Mandaya Hotel -->
+              <div class="card">
+                <img src="https://static.logitravel.com/cloudcontent/fotos/agregadorHotelero/0020/81976/2081976/52.jpg?f=15655854" alt="The Royal Mandaya Hotel">
+                <h4>The Royal Mandaya Hotel</h4>
+                <p>Known for its warm hospitality and elegant accommodations, The Royal Mandaya is a favorite among travelers seeking comfort in the city center.</p>
+              </div>
+              <!-- Apo View Hotel -->
+              <div class="card">
+                <img src="https://images.trvl-media.com/hotels/4000000/3160000/3152400/3152304/7de2d285_z.jpg" alt="Apo View Hotel">
+                <h4>Apo View Hotel</h4>
+                <p>One of Davao's oldest hotels, Apo View offers a rich history combined with modern amenities and services.</p>
+              </div>
+              <!-- Hotel Tropika Davao -->
+              <div class="card">
+                <img src="https://cf.bstatic.com/xdata/images/hotel/square600/44361020.webp?k=a7158133a182d58bf0555022ccb2c5ef8ac002b4b89abafd6e547ae35b19726a&o=" alt="Hotel Tropika Davao">
+                <h4>Hotel Tropika Davao</h4>
+                <p>A boutique hotel offering a tranquil environment and personalized services, perfect for a relaxing stay.</p>
+              </div>
+              <!-- Red Planet Davao -->
+              <div class="card">
+                <img src="https://cdn.redplanethotels.com/photos/hotel/20171127/dav/001.jpg" alt="Red Planet Davao">
+                <h4>Red Planet Davao</h4>
+                <p>Offers clean and affordable rooms, ideal for travelers seeking value without compromising comfort.</p>
+              </div>
+              <!-- Acacia Hotel Davao -->
+              <div class="card">
+                <img src="https://images.getaroom-cdn.com/image/upload/s--NkdC87fW--/c_limit,e_improve,fl_lossy.immutable_cache,h_940,q_auto:good,w_940/v1709188469/e482975db2c61818d621de2c14f058ca9681060e?atc=e7cd1cfa" alt="Acacia Hotel Davao">
+                <h4>Acacia Hotel Davao</h4>
+                <p>Known for its elegant interiors and heartfelt service, it's a preferred choice for both business and leisure stays.</p>
+              </div>
+              <!-- Dusit Thani Residence -->
+              <div class="card">
+                <img src="https://www.dusit.com/dusitthani-residencedavao/wp-content/uploads/sites/20/cache/2020/02/exterior-shot-banner/3189571676.jpg" alt="Dusit Thani Residence">
+                <h4>Dusit Thani Residence</h4>
+                <p>Offers upscale amenities, including an outdoor pool and fitness center, catering to both business and leisure travelers.</p>
+              </div>
+              <!-- Go Hotel Lanang -->
+              <div class="card">
+                <img src="https://cf.bstatic.com/xdata/images/hotel/square600/561834309.webp?k=c56e04136eb93f39130cacb0dde94ca8350f3a73919981ebeedff3075e3569a7&o=" alt="Go Hotel Lanang">
+                <h4>Go Hotel Lanang</h4>
+                <p>A budget-friendly hotel offering clean, cozy rooms in a convenient location near Lanang’s commercial and business districts.</p>
+              </div>
+              <!-- Hotel Emilia -->
+              <div class="card">
+                <img src="https://cf.bstatic.com/xdata/images/hotel/square600/206643691.webp?k=7c3f82c3236915bae094e0d3808f3df8e9083b7463d770efd409c10ff5616731&o=" alt="Hotel Emilia Davao">
+                <h4>Hotel Emilia</h4>
+                <p>Hotel Emilia offers cozy accommodations in the heart of Davao City, perfect for travelers seeking comfort and convenience at an affordable price.</p>
+              </div>
+              <!-- Sotogrande Davao Hotel -->
+              <div class="card">
+                <img src="https://cf.bstatic.com/xdata/images/hotel/square600/489167900.webp?k=0696ddc42251b33d9262abcc2f50b59412ce9f58509717080ce370374ec7e2ca&o=" alt="Sotogrande Davao Hotel">
+                <h4>Sotogrande Davao Hotel</h4>
+                <p>Located near Davao Crocodile Park, this hotel offers upscale comfort with an outdoor pool, sauna, fitness center, and event facilities — perfect for both leisure and business travelers.</p>
+              </div>
+              <!-- DusitD2 Davao Hotel -->
+              <div class="card">
+                <img src="https://cf.bstatic.com/xdata/images/hotel/square600/665275069.webp?k=229df7dc291a2c0799077f3d602d061d62ce7d8219354cb75828748a9d6a4ec2&o=" alt="DusitD2 Davao">
+                <h4>DusitD2 Davao</h4>
+                <p>Luxury hotel located in downtown Davao City featuring elegant rooms, a rooftop pool, spa, fitness center, and several dining options for a truly relaxing stay.</p>
+              </div>
+            </div>
+          </section><br><br>
+
+          <!-- Election Winners -->
+          <section class="section places-section" id="organizationchart">
+            <h2 class="organizationchart-title">🏛️ Pride Makers Organization Chart</h2>
+            <div class="org-chart">
+
+              <!--Mayor of Davao -->
+              <div class="org-node">
+                <div class="org-box">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/President_Rodrigo_Duterte_portrait_%28cropped%29.jpg/500px-President_Rodrigo_Duterte_portrait_%28cropped%29.jpg" alt="Rodrigo Duterte" />
+                  <h4>DUTERTE , RODRIGO</h4>
+                  <p>Former President & Mayor</p>
+                </div>
+              </div>
+             
+              <!-- Vice Mayor -->
+              <div class="org-node">
+                <div class="org-box">
+                  <img src="C:\Users\63965\Documents\DULA DAISY JOY G. PYTHON\OneDrive\DAVAO WEBPAGES\baste.jpg" alt="Baste Duterte" />
+                  <h4>DUTERTE, BASTE</h4>
+                  <p>Vice Mayor, Davao City</p>
+                </div>
+              </div>
+
+              <!-- District Representatives Row -->
+              <div class="org-branch" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+
+                <!-- 1st DIST, CITY OF DAVAO -->
+                <div class="org-node">
+                  <div class="org-box">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/President_Rodrigo_Duterte_portrait_%28cropped%29.jpg/500px-President_Rodrigo_Duterte_portrait_%28cropped%29.jpg"" alt="Vincent Garcia" />
+                    <h4>DUTERTE , RODRIGO</h4>
+                    <p>1st DIST, CITY OF DAVAO</p>
+                  </div>
+                </div>
+
+                <!-- 2nd DIST, CITY OF DAVAO -->
+                <div class="org-node">
+                  <div class="org-box">
+                    <img src="https://www.bing.com/th/id/OIP.G-PklZ5x5E26z-yhc7VX6wHaE8?w=174&h=185&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2" alt="Isidro Ungab" />
+                    <h4>MAHIPUS, ATTY. DIOSDADO</h4>
+                    <p>2nd DIST, CITY OF DAVAO</p>
+                  </div>
+                </div>
+
+                <!-- 3rd DIST, CITY OF DAVAO -->
+                <div class="org-node">
+                  <div class="org-box">
+                    <img src="C:\Users\63965\Pictures\Screenshots\Screenshot 2025-05-23 140134.png" alt="Baste Duterte" />
+                    <h4>UNGAB, ALBERTO </h4>
+                    <p>3rd DIST, CITY OF DAVAO</p>
+                  </div>
+                </div>
+
+              </div>
+            
+               <!-- LEGDIST Representatives Row -->
+              <div class="org-branch" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+
+                <!-- 1st DIST, CITY OF DAVAO -->
+                <div class="org-node">
+                  <div class="org-box">
+                    <img src="https://th.bing.com/th/id/OIP.xkwT9sNGIS-tSTk83zBCqwHaFI?o=7&cb=iwp2rm=3&rs=1&pid=ImgDetMain" alt="Vincent Garcia" />
+                    <h4>DUTERTE, PAOLO</h4>
+                    <p>1st LEGDIST, CITY OF DAVA</p>
+                  </div>
+                </div>
+
+                <!-- 2nd DIST, CITY OF DAVAO -->
+                <div class="org-node">
+                  <div class="org-box">
+                    <img src="https://images.openai.com/thumbnails/841a0febf60ec1703e3a3bd95d72bfd7.jpeg" alt="Isidro Ungab" />
+                    <h4>DUTERTE, OMAR </h4>
+                    <p>2nd LEGDIST, CITY OF DAVA</p>
+                  </div>
+                </div>
+
+                <!-- 3rd DIST, CITY OF DAVAO -->
+                <div class="org-node">
+                  <div class="org-box">
+                    <img src="https://th.bing.com/th/id/OSK.f0cbbd154622dfd699bcb2e3bef49635?w=155&h=200&c=7&rs=1&o=6&dpr=1.3&pid=SANGAM" alt="Baste Duterte" />
+                    <h4>UNGAB, ISIDRO </h4>
+                    <p>3rd LEGDIST, CITY OF DAVA</p>
+                  </div>
+                </div>
+
+              </div>
+          </section>
+
+          <section id="news" class="news-item ">
+              <div class="">
+                <h2 class="organizationchart-title">Davao City News Highlights</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+
+                  <!-- News Item 1 -->
+                  <div class="news-item ">
+                    <h3 class=".news-title">Rodrigo Duterte Re-elected as Davao Mayor from ICC Detention</h3>
+                    <p class=" .news-card p">Former President Rodrigo Duterte won the mayoral race while detained at The Hague, earning over 660,000 votes.</p>
+                    <a href="https://apnews.com/article/5c7ac2250249f71281ad2eab9daef511" target="_blank" class="text-blue-600 hover:underline">Read more</a>
+                  </div>
+
+                  <!-- News Item 2 -->
+                  <div class="news-item ">
+                    <h3 class=".news-title">VP Sara Duterte Faces Impeachment Trial</h3>
+                    <p class=" .news-card p">Set for July, Sara Duterte's impeachment trial will tackle misuse of public funds and an alleged assassination plot.</p>
+                    <a href="https://apnews.com/article/5c7ac2250249f71281ad2eab9daef511" target="_blank" class="text-blue-600 hover:underline">Read more</a>
+                  </div>
+
+                  <!-- News Item 3 -->
+                  <div class="news-item ">
+                    <h3 class=".news-title">Protect Sara Duterte Coalition Launched in Davao City</h3>
+                    <p class=" .news-card p">Up to 79 groups gathered to support VP Sara Duterte, opposing the impeachment complaint against her.</p>
+                    <a href="https://www.gmanetwork.com/news/topstories/nation/937312/protect-sara-duterte-coalition-launched-in-davao-city/story/" target="_blank" class="text-blue-600 hover:underline">Read more</a>
+                  </div>
+
+                  <!-- News Item 4 -->
+                  <div class="news-item ">
+                    <h3 class=".news-title">Nograles Plans to Make Davao City a Digital Hub</h3>
+                    <p class=" .news-card p">Mayoral candidate Karlo Nograles aims to transform Davao City into a digital hub to attract more investors.</p>
+                    <a href="https://manilastandard.net/news/elections-2025/314515122/nograles-plans-to-make-davao-city-a-digital-hub.html" target="_blank" class="text-blue-600 hover:underline">Read more</a>
+                  </div>
+
+                  <!-- News Item 5 -->
+                  <div class="news-item ">
+                    <h3 class=".news-title">March 17, 2025 Declared Special Non-Working Day in Davao City</h3>
+                    <p class=" .news-card p">Malacañang declared March 17 as a special non-working day for the 88th Araw ng Dabaw celebration.</p>
+                    <a href="https://www.gmanetwork.com/regionaltv/news/107091/march-17-2025-declared-special-non-working-day-in-davao-city/story/" target="_blank" class="text-blue-600 hover:underline">Read more</a>
+                  </div>
+
+                  <!-- News Item 6 -->
+                  <div class="news-item ">
+                    <h3 class=".news-title">CLI HomeFest 2025 Kicks Off in Davao</h3>
+                    <p class=" .news-card p">Cebu Landmasters Inc. launched its HomeFest 2025 in Davao City, offering exclusive home financing deals.</p>
+                    <a href="https://www.sunstar.com.ph/davao/cli-homefest-2025-kicks-off-in-davao" target="_blank" class="text-blue-600 hover:underline">Read more</a>
+                  </div>
+
+                  <!-- News Item 7 -->
+                  <div class="news-item ">
+                    <h3 class=".news-title">Davao City Gets Additional 11 Starlink WiFi Devices for May 12 Elections</h3>
+                    <p class=" .news-card p">Eleven Starlink WiFi devices and solar panels were delivered to enhance connectivity during elections.</p>
+                    <a href="https://mindanews.com/top-stories/2025/05/davao-city-gets-additional-11-starlink-wifi-devices-for-may-12-polls/" target="_blank" class="text-blue-600 hover:underline">Read more</a>
+                  </div>
+
+                  <!-- News Item 8 -->
+                  <div class="news-item ">
+                    <h3 class=".news-title">5K Cops to Secure 2025 NLE Polls in Davao City</h3>
+                    <p class=" .news-card p">Around 5,000 police personnel will be deployed to ensure peaceful and orderly elections in Davao City.</p>
+                    <a href="https://www.sunstar.com.ph/davao/5k-cops-to-secure-2025-nle-polls-in-davao-city" target="_blank" class="text-blue-600 hover:underline">Read more</a>
+                  </div>
+
+                  <!-- News Item 9 -->
+                  <div class="news-item ">
+                    <h3 class=".news-title">Davao City Records 1.8 Million Tourists in 2024, Eyes 2.5 Million in 2025</h3>
+                    <p class=" .news-card p">Davao City marked a major milestone in tourism, logging over 1.8 million tourist arrivals in 2024.</p>
+                    <a href="https://thesentry.ph/davao-city-records-1-8-million-tourists-in-2024-eyes-2-5-million-in-2025/" target="_blank" class="text-blue-600 hover:underline">Read more</a>
+                  </div>
+
+                  <!-- News Item 10 -->
+                  <div class="news-item ">
+                    <h3 class=".news-title">City All Ready for 2025 Araw ng Davao</h3>
+                    <p class=" .news-card p">The Davao City Tourism Operations Office announced full preparations for the Araw ng Davao 2025 celebrations.</p>
+                    <a href="https://www.sunstar.com.ph/davao/city-all-ready-for-2025-araw-ng-davao" target="_blank" class="text-blue-600 hover:underline">Read more</a>
+                  </div>
+                </div>
+              </div>
+          </section>
+
+            <!--Map-->
+            <section class="section map-section" id="map">
+                <h2 class="section-title">3D View: Davao City</h2>
+                <p class="map-description">Experience Davao City from above in stunning satellite view.</p>
+                <div class="map-container" style="height: 500px; border-radius: 15px; overflow: hidden;">
+                  <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m0!3m2!1sen!2sph!4v1716468390000!6m8!1m7!1sCAoSLEFGMVFpcE1tc2I2NXRxZWZIVmJHUk56SmNaT2JpdnJSZ3JhN3U0aVdxR2R3!2m2!1d7.0731!2d125.6124!3f75!4f0!5f1.3"
+                    width="100%" 
+                    height="100%" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                  </iframe>
+                </div>
+              </section>
+
+              <section class="section contact-section" id="contact">
+                  <h2 class="section-title">Contact Us</h2>
+                  <p>Have questions or want to book your next adventure? Send us a message!</p>
+                  
+                  <form class="contact-form" id="contact-Form" action="#" method="post">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="Your full name" required>
+
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Your email address" required>
+
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="5" placeholder="Write your message here..." required></textarea>
+
+                    <button type="submit" class="submit-btn">Send Message</button>
+                  </form>
+                </section>
+  </main>
+
+  <script>
+  // Contact Form Submission Logic
+  const form = document.getElementById('contactForm');
+
+  if (form) {
+    form.addEventListener('submit', function(event) {
+      event.preventDefault(); // Para di mu-submit og default
+
+      // Kuhaa ang values
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+
+      const message = form.message.value.trim();
+
+      // Basic Validation
+      if (!name || !email || !subject || !message) {
+        alert("Palihug kompletuhon tanan nga field.");
+        return;
+      }
+
+      // Optional: Pwede ka magbutang og email format validation diri
+
+      // Ipakita success message
+      alert(`Salamat, ${name}! Nadawat na namo imong mensahe.`);
+
+      // Limpyuhi ang form
+      form.reset();
+    });
+  }
+
+  // Logout Confirmation
+  function confirmLogout() {
+    if (confirm("Are you sure you want to log out?")) {
+      window.location.href = "Davao city.html";
+    }
+  }
+
+  // Active Link on Scroll
+  const links = document.querySelectorAll('.sidebar a');
+
+  window.addEventListener('scroll', () => {
+    const fromTop = window.scrollY + 100;
+
+    links.forEach(link => {
+      const section = document.querySelector(link.getAttribute('href'));
+      if (section) {
+        if (section.offsetTop <= fromTop && section.offsetTop + section.offsetHeight > fromTop) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      }
+    });
+  });
+
+   const modal = document.getElementById('popupModal');
+    const popupImage = document.getElementById('popupImage');
+    const popupTitle = document.getElementById('popupTitle');
+    const popupDescription = document.getElementById('popupDescription');
+    const popupClose = document.getElementById('popupClose');
+
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', () => {
+        const img = card.querySelector('img').src;
+        const title = card.querySelector('h4').textContent;
+        const description = card.querySelector('p').textContent;
+
+        popupImage.src = img;
+        popupTitle.textContent = title;
+        popupDescription.textContent = description;
+
+        modal.style.display = 'flex';
+      });
+    });
+
+    popupClose.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+</script>
+
+</body>
+</html>
+              
